@@ -1,29 +1,33 @@
-from Analyzer import analyze_expression
+from Analyzer import analyze_expression, OPERATORS
 
-VALID_INPUTS = ['+', '-', '*', '/', '^', '@', '$', '&', '%', '~', '!', '.']
+VALID_INPUTS = OPERATORS + ".0123456789"
 
 
 def get_expression() -> str:
     """
     receives from the user an expression to evaluate
     :return str: the given expression
+    :raise EOFError: if given in valid input
     """
-    try:
-        expression = input("Enter an expression for the calculator:\n\t")
-    except EOFError:
-        return "invalidInput"
+    expression = input("Enter an expression for the calculator:\n\t")
     return expression.strip(" ")
 
 
 def is_valid_expression(expression: str) -> bool:
-    return all(char in VALID_INPUTS or char.isnumeric() for char in expression)
+    """
+    returns if the given expression has invalid symbols in it
+    :param string expression: an expression to check
+    :return: returns if the given expression has invalid symbols in it
+    """
+    return all(char in VALID_INPUTS for char in expression)
 
 
 def main():
 
-    expression = get_expression()
-    if expression == "invalidInput":
-        print(expression)
+    try:
+        expression = get_expression()
+    except EOFError:
+        print("invalidInput")
         return
 
     if not is_valid_expression(expression):
@@ -31,8 +35,12 @@ def main():
         return
 
     # analyze (Analyzer.py)
-    token_ls = analyze_expression(expression)
-
+    try:
+        token_ls = analyze_expression(expression)
+    except ValueError as ve:
+        print(ve)
+        return
+    print(token_ls)
     # parse to tree (Parser.py)
 
     # get solution from tree (CalculateOperations.py)
