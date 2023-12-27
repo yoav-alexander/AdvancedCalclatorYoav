@@ -1,14 +1,10 @@
-from collections import namedtuple
 from typing import List, Union
+from Operators import OPERATORS
 
 """
 this module receives an expression and splits it into
 a list of tokens
 """
-
-# OPERATOR_SYMBOLS = [operator.symbol for operator in OPERATORS ]
-
-OPERATORS = "+-*/^@$&%~!"
 
 VALID_SYMBOLS = OPERATORS + "()"
 
@@ -42,7 +38,7 @@ def analyze_expression(expression: str) -> List[Union[int, str]]:
 
 def strip_minus(num_str: str) -> str:
     """
-    strips redundant '-' from given str
+    strips redundant '-' from the given str
     :param str num_str: a string to strip
     :return: returns the strip after it was striped
     """

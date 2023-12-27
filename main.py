@@ -2,16 +2,6 @@ from Analyzer import analyze_expression, VALID_SYMBOLS
 from CalculatorOperations import calculate_from_prefix
 from Parser import convert_to_postfix
 
-# Operator = namedtuple('Operator', "symbol priority inputs function ")
-# OPERATORS = [
-#     Operator('+', 1, 2),
-#     Operator('+', 1, 2),
-#     Operator('+', 1, 2),
-#     Operator('+', 1, 2),
-#     Operator('+', 1, 2),
-#     Operator('+', 1, 2),
-#
-# ]
 
 # all valid input symbols for the program
 VALID_INPUTS = VALID_SYMBOLS + ".0123456789"
@@ -47,14 +37,11 @@ def calculate_expression(expression: str) -> float:
     :return float : returns the solution to the given expression
     """
     is_valid_expression(expression)
-    # analyze
-    token_ls = analyze_expression(expression)
+    token_ls = analyze_expression(expression)  # splits the expression to tokens
     print(token_ls)
-    # parse to postfix
-    post_fix = convert_to_postfix(token_ls)
+    post_fix = convert_to_postfix(token_ls)  # convert the expression to postfix
     print(post_fix)
-    # get solution from postfix
-    result = calculate_from_prefix(post_fix)
+    result = calculate_from_prefix(post_fix)  # gets the final result from postfix expression
     return result
 
 

@@ -1,13 +1,11 @@
 from typing import List, Union
-from Analyzer import VALID_SYMBOLS, OPERATORS
+from Operators import PRIORITIES, OPERATORS
 
 """
 this module receives a list of tokens that are part of an expression,
 converts it to a postfix expression and runs checks that the
 expression is valid
 """
-
-PRIORITIES = {'+': 1, '-': 2, '*': 2, '/': 2, '^': 3, '@': 5, '$': 5, '&': 5, '%': 4, '~': 6, '!': 6}
 
 
 def convert_to_postfix(token_list: List[Union[int, str]]) -> List[Union[int, str]]:
