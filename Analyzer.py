@@ -1,3 +1,4 @@
+from collections import namedtuple
 from typing import List, Union
 
 """
@@ -5,7 +6,10 @@ this module receives an expression and splits it into
 a list of tokens
 """
 
+# OPERATOR_SYMBOLS = [operator.symbol for operator in OPERATORS ]
+
 OPERATORS = "+-*/^@$&%~!"
+
 VALID_SYMBOLS = OPERATORS + "()"
 
 
