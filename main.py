@@ -1,6 +1,7 @@
-from Analyzer import analyze_expression, OPERATORS
+from Analyzer import analyze_expression, VALID_SYMBOLS
+from Parser import convert_to_postfix
 
-VALID_INPUTS = OPERATORS + ".0123456789"
+VALID_INPUTS = VALID_SYMBOLS + ".0123456789"
 
 
 def get_expression() -> str:
@@ -22,28 +23,28 @@ def is_valid_expression(expression: str) -> bool:
     return all(char in VALID_INPUTS for char in expression)
 
 
-def main():
-
-    try:
-        expression = get_expression()
-    except EOFError:
-        print("invalidInput")
-        return
-
+def calculate_expression(expression: str) -> float:
+    """
+    receives and expression and returns its result
+    :param str expression: an expression to be evaluated
+    :return float : returns the solution to the given expression
+    """
     if not is_valid_expression(expression):
-        print("expression contains invalid inputs")
-        return
+        raise ValueError
 
     # analyze (Analyzer.py)
-    try:
-        token_ls = analyze_expression(expression)
-    except ValueError as ve:
-        print(ve)
-        return
+    token_ls = analyze_expression(expression)
     print(token_ls)
     # parse to tree (Parser.py)
+    post_fix = convert_to_postfix(token_ls)
+    print(post_fix)
 
     # get solution from tree (CalculateOperations.py)
+
+
+def main():
+    expression = get_expression()
+    calculate_expression(expression)
 
 
 if __name__ == '__main__':

@@ -1,12 +1,13 @@
 from typing import List, Union
 
-
 """
 this module receives an expression and splits it into
 a list of tokens
 """
 
 OPERATORS = "+-*/^@$&%~!"
+VALID_SYMBOLS = OPERATORS + "()"
+
 
 def analyze_expression(expression: str) -> List[Union[int, str]]:
     """
@@ -18,7 +19,7 @@ def analyze_expression(expression: str) -> List[Union[int, str]]:
     token_list = []
     num = ""
     for index, char in enumerate(expression):
-        if part_of_number(expression, index):
+        if is_part_of_number(expression, index):
             num += char
             continue
 
@@ -41,12 +42,10 @@ def strip_minus(num_str: str) -> str:
     :param str num_str: a string to strip
     :return: returns the strip after it was striped
     """
-    if len(num_str) != 0 and num_str[0] == '-':
-        return "-" + num_str.strip("-")
-    return num_str
+    return num_str.strip("-") if num_str.count('-') % 2 == 0 else '-' + num_str.strip("-")
 
 
-def part_of_number(expression: str, index: int) -> bool:
+def is_part_of_number(expression: str, index: int) -> bool:
     """
     returns if a char in place "index" is a part of a number
     :param string expression: the whole expression
@@ -57,4 +56,4 @@ def part_of_number(expression: str, index: int) -> bool:
     before_numeric = index != 0 and expression[index - 1].isnumeric()
     after_numeric = index < len(expression) - 1 and expression[index + 1] in "0123456789-"
     negative = char == '-' and not before_numeric and after_numeric
-    return char not in OPERATORS or negative
+    return char not in VALID_SYMBOLS or negative
