@@ -6,7 +6,7 @@ this module receives an expression and splits it into
 a list of tokens
 """
 
-VALID_SYMBOLS = OPERATORS + "()"
+VALID_SYMBOLS = ''.join(OPERATORS.keys()) + "()"
 
 
 def analyze_expression(expression: str) -> List[Union[int, str]]:

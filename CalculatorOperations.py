@@ -1,5 +1,5 @@
 from typing import List, Union
-from Operators import INPUTS, CALCULATIONS
+from Operators import OPERATORS
 
 """
 this module receives a tree of operations and
@@ -14,7 +14,7 @@ def calculate_from_prefix(postfix_list: List[Union[int, str]]) -> float:
     :return float : returns the solution to the expression
     :raise ValueError: if the expression is unsolvable or invalid
     """
-    changed = True  # marks it the list was changed during the iteration
+    changed = True  # marks if the list was changed during the iteration
     index = -1
     while len(postfix_list) > 1:
         if index == len(postfix_list) and not changed:
@@ -29,14 +29,14 @@ def calculate_from_prefix(postfix_list: List[Union[int, str]]) -> float:
         if isinstance(token, float):
             changed = False
             continue
-        args = postfix_list[index - INPUTS[token]: index]
+        args = postfix_list[index - OPERATORS[token].inputs: index]
         if not is_valid_args(args):
             changed = False
             continue
         print("args: ", args)
-        result = CALCULATIONS[token](*args)
-        del postfix_list[index - INPUTS[token]: index + 1]  # removes the operation from the list
-        postfix_list.insert(index - INPUTS[token], result)  # inserts the operation's result to the list
+        result = OPERATORS[token].function(*args)
+        del postfix_list[index - OPERATORS[token].inputs: index + 1]  # removes the operation from the list
+        postfix_list.insert(index - OPERATORS[token].inputs, result)  # inserts the operation's result to the list
     return postfix_list[0]
 
 

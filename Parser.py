@@ -1,5 +1,5 @@
 from typing import List, Union
-from Operators import PRIORITIES, OPERATORS
+from Operators import OPERATORS
 
 """
 this module receives a list of tokens that are part of an expression,
@@ -22,7 +22,7 @@ def convert_to_postfix(token_list: List[Union[int, str]]) -> List[Union[int, str
         if isinstance(token, float):
             postfix.append(token)
         elif token in OPERATORS:
-            while len(stack) > 0 and stack[-1] != '(' and PRIORITIES[stack[-1]] >= PRIORITIES[token]:
+            while len(stack) > 0 and stack[-1] != '(' and has_priority(stack[-1], token):
                 postfix.append(stack.pop())
             stack.append(token)
         elif token == '(':
@@ -33,3 +33,13 @@ def convert_to_postfix(token_list: List[Union[int, str]]) -> List[Union[int, str
             stack.pop()  # pops '('
     postfix.extend(reversed(stack))
     return postfix
+
+
+def has_priority(operator1: str, operator2: str) -> bool:
+    """
+    returns if operator1 has_priority over operator2
+    :param str operator1: the first operator to check
+    :param str operator2:  the second operator to check
+    :return bool: returns if operator1 has_priority over operator2
+    """
+    return OPERATORS[operator1].priority >= OPERATORS[operator2].priority
