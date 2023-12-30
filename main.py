@@ -1,7 +1,6 @@
-from Analyzer import analyze_expression, VALID_SYMBOLS
+from Analyzer import analyze_expression, is_valid_expression
+from OperationsCalculator import calculate_from_prefix
 from Parser import convert_to_postfix
-
-VALID_INPUTS = VALID_SYMBOLS + ".0123456789"
 
 
 def get_expression() -> str:
@@ -11,16 +10,7 @@ def get_expression() -> str:
     :raise EOFError: if given in valid input
     """
     expression = input("Enter an expression for the calculator:\n\t")
-    return expression.strip(" ")
-
-
-def is_valid_expression(expression: str) -> bool:
-    """
-    returns if the given expression has invalid symbols in it
-    :param string expression: an expression to check
-    :return: returns if the given expression has invalid symbols in it
-    """
-    return all(char in VALID_INPUTS for char in expression)
+    return expression.replace(" ", "")
 
 
 def calculate_expression(expression: str) -> float:
@@ -29,22 +19,19 @@ def calculate_expression(expression: str) -> float:
     :param str expression: an expression to be evaluated
     :return float : returns the solution to the given expression
     """
-    if not is_valid_expression(expression):
-        raise ValueError
-
-    # analyze (Analyzer.py)
-    token_ls = analyze_expression(expression)
+    is_valid_expression(expression)
+    token_ls = analyze_expression(expression)  # splits the expression to tokens
     print(token_ls)
-    # parse to tree (Parser.py)
-    post_fix = convert_to_postfix(token_ls)
+    post_fix = convert_to_postfix(token_ls)  # convert the expression to postfix
     print(post_fix)
-
-    # get solution from tree (CalculateOperations.py)
+    result = calculate_from_prefix(post_fix)  # gets the final result from postfix expression
+    return result
 
 
 def main():
     expression = get_expression()
-    calculate_expression(expression)
+    print(expression)
+    print("result:", calculate_expression(expression))
 
 
 if __name__ == '__main__':
