@@ -18,6 +18,7 @@ def calculate_expression(expression: str) -> float:
     receives and expression and returns its result
     :param str expression: an expression to be evaluated
     :return float : returns the solution to the given expression
+    :raise ValueError: if the given expression is invalid
     """
     is_valid_expression(expression)
     token_ls = analyze_expression(expression)  # splits the expression to tokens
@@ -29,9 +30,19 @@ def calculate_expression(expression: str) -> float:
 
 
 def main():
-    expression = get_expression()
-    print(expression)
-    print("result:", calculate_expression(expression))
+
+    try:
+        expression = get_expression()
+    except EOFError:
+        print("invalid input")
+        return
+    try:
+        result = calculate_expression(expression)
+    except ValueError as e:
+        print(e)
+        return
+
+    print(f"{expression} = {result} ")
 
 
 if __name__ == '__main__':

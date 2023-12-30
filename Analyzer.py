@@ -16,7 +16,7 @@ def analyze_expression(expression: str) -> List[Union[int, str]]:
     receives a string expression and converts it into a list basic tokens
     :param str expression: string expression
     :return  List[Union[int, str]: a list basic tokens
-    :raise ValueError: if given invalid syntax
+    :raise ValueError: if given invalid number syntax or operator syntax
     """
     token_list = []
     num = ""

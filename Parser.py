@@ -13,6 +13,7 @@ def convert_to_postfix(token_list: List[Union[int, str]]) -> List[Union[int, str
     converts a list of tokens to the corresponding prefix expression
     :param List[Union[int, str]] token_list: a list of numbers, operands and parenthesis that form an expression
     :return List[Union[int, str]]: returns the resulting postfix expression
+    :raise valueError: if given expression is with invalid parenthesis
     """
     # :algorithm : this function uses an implementation the Shunting yard algorithm
     stack = []
