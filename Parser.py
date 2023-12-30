@@ -31,6 +31,10 @@ def convert_to_postfix(token_list: List[Union[int, str]]) -> List[Union[int, str
             while stack[-1] != '(':
                 postfix.append(stack.pop())
             stack.pop()  # pops '('
+
+    if "(" in stack or ")" in stack:
+        raise ValueError("invalid parenthesis order ")
+
     postfix.extend(reversed(stack))
     return postfix
 

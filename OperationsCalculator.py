@@ -14,29 +14,33 @@ def calculate_from_prefix(postfix_list: List[Union[int, str]]) -> float:
     :return float : returns the solution to the expression
     :raise ValueError: if the expression is unsolvable or invalid
     """
-    changed = True  # marks if the list was changed during the iteration
+    changed = False  # marks if the list was changed during the iteration
     index = -1
     while len(postfix_list) > 1:
-        if index == len(postfix_list) and not changed:
-            raise ValueError("the given expression is invalid")
-        changed = True
-
         index += 1
         print(index, "list:", postfix_list)
+
+        if all(isinstance(token, float) for token in postfix_list):
+            raise ValueError(f"the given expression is invalid! are you missing any operators? ")
+        if index == len(postfix_list) and not changed:  # TODO probably can remove
+            faulty_operators = list(filter(lambda t: t in OPERATORS.keys(), postfix_list))
+            raise ValueError(f"!!!!!!!!! the given expression is invalid: {faulty_operators}")
         index = index % len(postfix_list)
         token = postfix_list[index]
 
         if isinstance(token, float):
-            changed = False
             continue
+
         args = postfix_list[index - OPERATORS[token].inputs: index]
-        if not is_valid_args(args):
-            changed = False
+        if not is_valid_args(args) or len(args) != OPERATORS[token].inputs:
             continue
+
         print("args: ", args)
         result = OPERATORS[token].function(*args)
         del postfix_list[index - OPERATORS[token].inputs: index + 1]  # removes the operation from the list
         postfix_list.insert(index - OPERATORS[token].inputs, result)  # inserts the operation's result to the list
+        changed = True
+
     return postfix_list[0]
 
 

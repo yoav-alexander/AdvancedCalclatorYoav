@@ -1,10 +1,6 @@
-from Analyzer import analyze_expression, VALID_SYMBOLS
-from CalculatorOperations import calculate_from_prefix
+from Analyzer import analyze_expression, is_valid_expression
+from OperationsCalculator import calculate_from_prefix
 from Parser import convert_to_postfix
-
-
-# all valid input symbols for the program
-VALID_INPUTS = VALID_SYMBOLS + ".0123456789"
 
 
 def get_expression() -> str:
@@ -15,19 +11,6 @@ def get_expression() -> str:
     """
     expression = input("Enter an expression for the calculator:\n\t")
     return expression.replace(" ", "")
-
-
-def is_valid_expression(expression: str):
-    """
-    returns if the given expression has invalid symbols in it
-    :param string expression: an expression to check
-    :raise ValueError: if the expression contains invalid symbols
-    """
-    for char in expression:
-        if char not in VALID_INPUTS:
-            raise ValueError(f"expression contains invalid symbol: {char}")
-    if len(expression) == 0:
-        raise ValueError("empty input")
 
 
 def calculate_expression(expression: str) -> float:
@@ -48,7 +31,7 @@ def calculate_expression(expression: str) -> float:
 def main():
     expression = get_expression()
     print(expression)
-    print(calculate_expression(expression))
+    print("result:", calculate_expression(expression))
 
 
 if __name__ == '__main__':
