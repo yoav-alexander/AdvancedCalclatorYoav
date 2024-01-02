@@ -14,8 +14,8 @@ def convert_to_postfix(token_list: List[Union[int, str]]) -> List[Union[int, str
     :param List[Union[int, str]] token_list: a list of numbers, operands and parenthesis that form an expression
     :return List[Union[int, str]]: returns the resulting postfix expression
     :raise valueError: if given expression is with invalid parenthesis
+    :algorithm : this function uses an implementation the Shunting yard algorithm
     """
-    # :algorithm : this function uses an implementation the Shunting yard algorithm
     stack = []
     postfix = []
 
@@ -29,6 +29,9 @@ def convert_to_postfix(token_list: List[Union[int, str]]) -> List[Union[int, str
         elif token == '(':
             stack.append(token)
         elif token == ')':
+            if stack[-1] == '(':
+                raise ValueError("invalid parenthesis in expression ")
+
             while stack[-1] != '(':
                 postfix.append(stack.pop())
             stack.pop()  # pops '('

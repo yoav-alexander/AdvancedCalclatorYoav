@@ -27,11 +27,15 @@ def analyze_expression(expression: str) -> List[Union[int, str]]:
 
         if num != "":
             num = strip_minus(num)
+            if num[0] == '.' or num[-1] == '.':
+                raise ValueError(f"number can't start or end with '.': {num} ")
             try:
-                token_list.append(float(num.lstrip('.')))
+                token_list.append(float(num))
             except ValueError:
                 raise ValueError(f"invalid number syntax: {num}")
             num = ""
+            if char == "(":  # adds implicit "*" between number and "("
+                token_list.append("*")
 
         token_list.append(char)
 
@@ -59,7 +63,7 @@ def is_valid_order(token_list: List[Union[int, str]]):
         if OPERATORS[token].input_before:
             if index == 0:
                 raise ValueError(f" '{token}' operator can't be the at the start of an expression")
-            if isinstance(token_list[index - 1], str) and token_list[index - 1] != ")":
+            if isinstance(token_list[index - 1], str) and token_list[index - 1] not in ")!":
                 raise ValueError(f"invalid syntax for operation: {token_list[index - 1]} {token} X")
 
         if OPERATORS[token].input_after:

@@ -18,7 +18,7 @@ def calculate_from_prefix(postfix_list: List[Union[int, str]]) -> float:
     index = -1
     while len(postfix_list) > 1:
         index += 1
-        print(index, "list:", postfix_list)
+        # print(index, "list:", postfix_list)
 
         if all(isinstance(token, float) for token in postfix_list):
             raise ValueError(f"the given expression is invalid! are you missing any operators? ")
@@ -35,7 +35,7 @@ def calculate_from_prefix(postfix_list: List[Union[int, str]]) -> float:
         if not is_valid_args(args) or len(args) != OPERATORS[token].inputs:
             continue
 
-        print("args: ", args)
+        # print("args: ", args)
         result = OPERATORS[token].function(*args)
         del postfix_list[index - OPERATORS[token].inputs: index + 1]  # removes the operation from the list
         postfix_list.insert(index - OPERATORS[token].inputs, result)  # inserts the operation's result to the list
