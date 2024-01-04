@@ -1,58 +1,79 @@
-from typing import List, Union
-from Operators import OPERATORS
+from typing import List
+from Operators import OPERATORS, IMPLIED_OPERATORS
 
 """
 this module receives an expression and splits it into
 a list of tokens
 """
 
-VALID_SYMBOLS = ''.join(OPERATORS.keys()) + "()"
+VALID_SYMBOLS = ''.join(filter(lambda op: op not in IMPLIED_OPERATORS, OPERATORS.keys())) + "()"
 # all valid input symbols for the program
-VALID_INPUTS = VALID_SYMBOLS + ".0123456789"
+NUMERICS = ".0123456789"
+VALID_INPUTS = VALID_SYMBOLS + NUMERICS
+
+VALID_BEFORE = ")!"  # values apart from numbers that can be before an operator
+VALID_AFTER = "s("  # values apart from numbers that can be after an operator
 
 
-def analyze_expression(expression: str) -> List[Union[int, str]]:
+def analyze_expression(expression: str) -> List[float | str]:  # TODO add checks for 1+()+3
     """
     receives a string expression and converts it into a list basic tokens
     :param str expression: string expression
-    :return  List[Union[int, str]: a list basic tokens
+    :return  List[Union[float, str]]: a list basic tokens
     :raise ValueError: if given invalid number syntax or operator syntax
     """
     token_list = []
     num = ""
     for index, char in enumerate(expression):
-        if is_part_of_number(expression, index):
+        if char in NUMERICS:
             num += char
             continue
 
         if num != "":
-            num = strip_minus(num)
-            if num[0] == '.' or num[-1] == '.':
-                raise ValueError(f"number can't start or end with '.': {num} ")
-            try:
-                token_list.append(float(num))
-            except ValueError:
-                raise ValueError(f"invalid number syntax: {num}")
+            token_list.append(get_number(num))
             num = ""
-            if char == "(":  # adds implicit "*" between number and "("
-                token_list.append("*")
 
-        token_list.append(char)
+        # checks for special operators
+        for symbol, attributes in IMPLIED_OPERATORS.items():
+            if attributes.check_func(expression, index):
+                token_list.append(symbol)
+                break
+        else:
+            token_list.append(char)
 
     if num != "":
-        num = strip_minus(num)
-        token_list.append(float(num.lstrip('.')))
+        token_list.append(get_number(num))
 
     # checks if operators placements are possible
-    is_valid_order(token_list)
+    #is_valid_order(token_list)
 
     return token_list
 
 
-def is_valid_order(token_list: List[Union[int, str]]):
+def get_number(num_str: str) -> float:  # todo: add Doc Sting or remove
+    # num_list = strip_minus(num_str)
+    check_valid_number(num_str)  # checks if the number is in the correct syntax
+    return float(num_str)
+
+
+def check_valid_number(num: str) -> None:
+    """
+    check if the given number has valid syntax
+    :param num: a string representing a number
+    :raise ValueError: if the given number syntax is invalid
+    """
+    if num[0] == "." or num[-1] == ".":
+        raise ValueError(f"invalid number syntax! '.' in invalid place: {num} ")
+    try:
+        float(num)
+    except ValueError:
+        raise ValueError(f"invalid number syntax: {num}")
+
+
+def is_valid_order(token_list: List[float | str]) -> None:
     """
     checks if the operators placements are possible in the given operation
-    :param  List[Union[int, str]] token_list: a list of token that form an expression
+    :param  List[Union[float, str]] token_list: a list of token that form an expression
     :raise value error: if the operator placement is impossible
     """
 
@@ -63,45 +84,50 @@ def is_valid_order(token_list: List[Union[int, str]]):
         if OPERATORS[token].input_before:
             if index == 0:
                 raise ValueError(f" '{token}' operator can't be the at the start of an expression")
-            if isinstance(token_list[index - 1], str) and token_list[index - 1] not in ")!":
-                raise ValueError(f"invalid syntax for operation: {token_list[index - 1]} {token} X")
+            if valid_symbol(token_list[index-1], VALID_BEFORE):
+                error_message = f"{token_list[index - 1]} {token} {'X' if OPERATORS[token].input_after else ''}"
+                raise ValueError(f"invalid syntax for operation: {error_message}")
 
         if OPERATORS[token].input_after:
             if index == len(token_list) - 1:
                 raise ValueError(f" '{token}' operator can't be the at the end of an expression")
-            if isinstance(token_list[index + 1], str) and token_list[index + 1] != "(":
-                raise ValueError(f"invalid syntax for operation: X {token} {token_list[index + 1]}")
+            if valid_symbol(token_list[index+1], VALID_AFTER):
+                error_message = f"{'X' if OPERATORS[token].input_before else ''} {token} {token_list[index + 1]}"
+                raise ValueError(f"invalid syntax for operation: {error_message}")
 
 
-def strip_minus(num_str: str) -> str:
+def valid_symbol(token: str | float, accepted_values: list[str] | str) -> bool:
     """
-    strips redundant '-' from the given str
-    :param str num_str: a string to strip
-    :return: returns the strip after it was striped
+    returns if the given token is valid given the accepted_values given
+    :param str | float token: a number or operator in the expression
+    :param list[str] | str accepted_values: a list of accepted_values for the token
+    :return bool: returns if the given token is valid given the accepted_values given
     """
-    return num_str.strip("-") if num_str.count('-') % 2 == 0 else '-' + num_str.strip("-")
+    return isinstance(token, str) and token not in accepted_values
+
+# def strip_minus(num_str: str) -> List[str | float]:
+#     """
+#     strips redundant '-' from the given str and splits to list
+#     :param str num_str: a string to strip
+#     :return List[str]: returns a list of a number and a minus sign if needed
+#     """
+#     num = num_str.strip("-")
+#     return [num] if num_str.count('-') % 2 == 0 else ['s', num]
 
 
-def is_part_of_number(expression: str, index: int) -> bool:
-    """
-    returns if a char in place "index" is a part of a number
-    :param string expression: the whole expression
-    :param int index: index to check
-    :return: returns if a char in place "index" is a part of a number
-    """
-    char = expression[index]
-    before_numeric = index != 0 and expression[index - 1].isnumeric()
-    after_numeric = index < len(expression) - 1 and expression[index + 1] in "0123456789-"
-    negative = char == '-' and not before_numeric and after_numeric
-    return char not in VALID_SYMBOLS or negative
-
-
-def is_valid_expression(expression: str):
+def is_valid_expression(expression: str) -> None:
     """
     returns if the given expression has invalid symbols in it
     :param string expression: an expression to check
     :raise ValueError: if the expression contains invalid symbols
     """
+
+    for index, symbol in expression.split(" ")[:-1]:
+        if symbol == expression[index+1]:
+            raise ValueError(f"invalid spacing between number digits")
+
+    expression = "".join(expression.split())
+
     for char in expression:
         if char not in VALID_INPUTS:
             raise ValueError(f"expression contains invalid symbol: {char}")

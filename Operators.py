@@ -5,7 +5,7 @@ def divide(num1: float, num2: float) -> float:
     """
     returns num1 / num2
     :param float num1: number's numerator
-    :param float num2: number's denumerator
+    :param float num2: number's denominator
     :return float: returns num1 / num2
     :raise ValueError: if divides by 0
     """
@@ -14,7 +14,7 @@ def divide(num1: float, num2: float) -> float:
     return num1 / num2
 
 
-def factorial(num1: float) -> float:
+def factorial(num1: int) -> float:
     """
     returns the factorial of the given number
     :param num1: a whole non-negative number
@@ -42,8 +42,35 @@ def power(base: float, exponent: float) -> float:
     return base ** exponent
 
 
+def is_sign_minus(expression: str, index: int) -> bool:
+    """
+    returns if the symbol in index "index" is a sign minus
+    :param str expression: a string the contains the expression
+    :param int index: the index of the symbol to check
+    :return: returns if the symbol in index "index" is a sign minus
+    """
+    char = expression[index]
+    before_numeric = index != 0 and expression[index - 1].isnumeric()
+    after_numeric = index < len(expression) - 1 and expression[index + 1] in "0123456789-"
+    return char == '-' and not before_numeric and after_numeric
+
+
+class Implied_operators(NamedTuple):
+    priority: float
+    inputs: int
+    function: Callable[..., float]
+    check_func: Callable[[str, int], bool]
+    input_before: bool = True
+    input_after: bool = True
+
+
+IMPLIED_OPERATORS = {
+    'S': Implied_operators(1, 1, lambda num1: -num1, is_sign_minus),
+}
+
+
 class Operator(NamedTuple):
-    priority: int
+    priority: float
     inputs: int
     function: Callable[..., float]
     input_before: bool = True
@@ -63,3 +90,4 @@ OPERATORS = {
     '~': Operator(6, 1, lambda num1: -num1, input_before=False),
     '!': Operator(6, 1, factorial, input_after=False)
 }
+OPERATORS.update(IMPLIED_OPERATORS)
