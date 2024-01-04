@@ -65,7 +65,7 @@ class Implied_operators(NamedTuple):
 
 
 IMPLIED_OPERATORS = {
-    'S': Implied_operators(1, 1, lambda num1: -num1, is_sign_minus),
+    'S': Implied_operators(1, 1, lambda num1: -num1, is_sign_minus, input_before=False),
 }
 
 

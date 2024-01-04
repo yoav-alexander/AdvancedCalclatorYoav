@@ -12,7 +12,7 @@ NUMERICS = ".0123456789"
 VALID_INPUTS = VALID_SYMBOLS + NUMERICS
 
 VALID_BEFORE = ")!"  # values apart from numbers that can be before an operator
-VALID_AFTER = "s("  # values apart from numbers that can be after an operator
+VALID_AFTER = "S("  # values apart from numbers that can be after an operator
 
 
 def analyze_expression(expression: str) -> List[float | str]:  # TODO add checks for 1+()+3
@@ -45,7 +45,7 @@ def analyze_expression(expression: str) -> List[float | str]:  # TODO add checks
         token_list.append(get_number(num))
 
     # checks if operators placements are possible
-    #is_valid_order(token_list)
+    is_valid_order(token_list)
 
     return token_list
 
