@@ -6,13 +6,15 @@ this module receives an expression and splits it into
 a list of tokens
 """
 
-VALID_SYMBOLS = ''.join(filter(lambda op: op not in IMPLIED_OPERATORS, OPERATORS.keys())) + "()"
+VALID_SYMBOLS = ''.join(filter(lambda op: op not in IMPLIED_OPERATORS, OPERATORS)) + "()"
 # all valid input symbols for the program
 NUMERICS = ".0123456789"
 VALID_INPUTS = VALID_SYMBOLS + NUMERICS
 
-VALID_BEFORE = ")!"  # values apart from numbers that can be before an operator
-VALID_AFTER = "S("  # values apart from numbers that can be after an operator
+# values apart from numbers that can be before an operator
+VALID_BEFORE = ")" + ''.join([op for op in OPERATORS if not OPERATORS[op].input_after])
+# values apart from numbers that can be after an operator
+VALID_AFTER = "(" + ''.join([op for op in OPERATORS if not OPERATORS[op].input_before])
 
 
 def analyze_expression(expression: str) -> List[float | str]:  # TODO add checks for 1+()+3
@@ -30,7 +32,8 @@ def analyze_expression(expression: str) -> List[float | str]:  # TODO add checks
             continue
 
         if num != "":
-            token_list.append(get_number(num))
+            check_valid_number(num)  # checks if the number is in the correct syntax
+            token_list.append(float(num))  # it's ok to cast because "check_valid_number"
             num = ""
 
         # checks for special operators
@@ -42,18 +45,13 @@ def analyze_expression(expression: str) -> List[float | str]:  # TODO add checks
             token_list.append(char)
 
     if num != "":
-        token_list.append(get_number(num))
+        check_valid_number(num)  # checks if the number is in the correct syntax
+        token_list.append(float(num))  # it's ok to cast because "check_valid_number"
 
     # checks if operators placements are possible
     is_valid_order(token_list)
 
     return token_list
-
-
-def get_number(num_str: str) -> float:  # todo: add Doc Sting or remove
-    # num_list = strip_minus(num_str)
-    check_valid_number(num_str)  # checks if the number is in the correct syntax
-    return float(num_str)
 
 
 def check_valid_number(num: str) -> None:
@@ -78,7 +76,10 @@ def is_valid_order(token_list: List[float | str]) -> None:
     """
 
     for index, token in enumerate(token_list):
-        if token not in OPERATORS:
+
+        if token == "(" and index < len(token_list) - 1 and token_list[index + 1] == ")":
+            raise ValueError("invalid parenthesis syntax '()' ")
+        elif token not in OPERATORS:
             continue
 
         if OPERATORS[token].input_before:
@@ -122,8 +123,8 @@ def is_valid_expression(expression: str) -> None:
     :raise ValueError: if the expression contains invalid symbols
     """
 
-    for index, symbol in expression.split(" ")[:-1]:
-        if symbol == expression[index+1]:
+    for index, symbol in enumerate(expression.split(" ")[:-1]):
+        if symbol in NUMERICS and expression[index+1] in NUMERICS:
             raise ValueError(f"invalid spacing between number digits")
 
     expression = "".join(expression.split())
