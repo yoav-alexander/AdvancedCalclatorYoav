@@ -1,5 +1,6 @@
 from typing import List
 from Operators import OPERATORS, IMPLIED_OPERATORS
+from config import ExpressionSyntaxError
 
 """
 this module receives an expression and splits it into
@@ -22,7 +23,7 @@ def analyze_expression(expression: str) -> List[float | str]:  # TODO add checks
     receives a string expression and converts it into a list basic tokens
     :param str expression: string expression
     :return  List[Union[float, str]]: a list basic tokens
-    :raise ValueError: if given invalid number syntax or operator syntax
+    :raise ExpressionSyntaxError: if given invalid number syntax or operator syntax
     """
     token_list = []
     num = ""
@@ -58,14 +59,14 @@ def check_valid_number(num: str) -> None:
     """
     check if the given number has valid syntax
     :param num: a string representing a number
-    :raise ValueError: if the given number syntax is invalid
+    :raise ExpressionSyntaxError: if the given number syntax is invalid
     """
     if num[0] == "." or num[-1] == ".":
-        raise ValueError(f"invalid number syntax! '.' in invalid place: {num} ")
+        raise ExpressionSyntaxError(f"invalid number syntax! '.' in invalid place: {num} ")
     try:
         float(num)
     except ValueError:
-        raise ValueError(f"invalid number syntax: {num}")
+        raise ExpressionSyntaxError(f"invalid number syntax: {num}")
 
 
 def is_valid_order(token_list: List[float | str]) -> None:
@@ -78,23 +79,23 @@ def is_valid_order(token_list: List[float | str]) -> None:
     for index, token in enumerate(token_list):
 
         if token == "(" and index < len(token_list) - 1 and token_list[index + 1] == ")":
-            raise ValueError("invalid parenthesis syntax '()' ")
+            raise ExpressionSyntaxError("invalid parenthesis syntax '()' ")
         elif token not in OPERATORS:
             continue
 
         if OPERATORS[token].input_before:
             if index == 0:
-                raise ValueError(f" '{token}' operator can't be the at the start of an expression")
+                raise ExpressionSyntaxError(f" '{token}' operator can't be the at the start of an expression")
             if valid_symbol(token_list[index-1], VALID_BEFORE):
                 error_message = f"{token_list[index - 1]} {token} {'X' if OPERATORS[token].input_after else ''}"
-                raise ValueError(f"invalid syntax for operation: {error_message}")
+                raise ExpressionSyntaxError(f"invalid syntax for operation: {error_message}")
 
         if OPERATORS[token].input_after:
             if index == len(token_list) - 1:
-                raise ValueError(f" '{token}' operator can't be the at the end of an expression")
+                raise ExpressionSyntaxError(f" '{token}' operator can't be the at the end of an expression")
             if valid_symbol(token_list[index+1], VALID_AFTER):
                 error_message = f"{'X' if OPERATORS[token].input_before else ''} {token} {token_list[index + 1]}"
-                raise ValueError(f"invalid syntax for operation: {error_message}")
+                raise ExpressionSyntaxError(f"invalid syntax for operation: {error_message}")
 
 
 def valid_symbol(token: str | float, accepted_values: list[str] | str) -> bool:
@@ -120,17 +121,17 @@ def is_valid_expression(expression: str) -> None:
     """
     returns if the given expression has invalid symbols in it
     :param string expression: an expression to check
-    :raise ValueError: if the expression contains invalid symbols
+    :raise ExpressionSyntaxError: if the expression contains invalid symbols
     """
 
     for index, symbol in enumerate(expression.split(" ")[:-1]):
         if symbol in NUMERICS and expression[index+1] in NUMERICS:
-            raise ValueError(f"invalid spacing between number digits")
+            raise ExpressionSyntaxError(f"invalid spacing between number digits")
 
     expression = "".join(expression.split())
 
     for char in expression:
         if char not in VALID_INPUTS:
-            raise ValueError(f"expression contains invalid symbol: {char}")
+            raise ExpressionSyntaxError(f"expression contains invalid symbol: {char}")
     if len(expression) == 0:
-        raise ValueError("empty input")
+        raise ExpressionSyntaxError("empty input")

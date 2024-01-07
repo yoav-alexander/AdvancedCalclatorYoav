@@ -1,5 +1,6 @@
 from typing import List
 from Operators import OPERATORS
+from config import ExpressionSyntaxError
 
 """
 this module receives a postfix expression of operations and
@@ -12,7 +13,7 @@ def calculate_from_prefix(postfix_list: List[int | str]) -> float:
     return the solution to an expression in prefix notation
     :param List[Union[int, str]] postfix_list: a list of the expression in prefix notation
     :return float : returns the solution to the expression
-    :raise ValueError: if the expression is unsolvable or invalid
+    :raise ExpressionSyntaxError: if the expression is unsolvable or invalid
     """
     changed = False  # marks if the list was changed during the iteration
     index = -1
@@ -21,10 +22,10 @@ def calculate_from_prefix(postfix_list: List[int | str]) -> float:
         print(index, "list:", postfix_list)
 
         if all(isinstance(token, float) for token in postfix_list):
-            raise ValueError(f"the given expression is invalid! are you missing any operators? ")
+            raise ExpressionSyntaxError("expression invalid! are you missing any operators? ")
         if index == len(postfix_list) and not changed:
             faulty_operators = " or ".join([token for token in postfix_list if token in OPERATORS])
-            raise ValueError(f"the given expression is invalid! there is something wrong near {faulty_operators}")
+            raise ExpressionSyntaxError(f"expression invalid! there is something wrong near {faulty_operators}")
         index = index % len(postfix_list)
         token = postfix_list[index]
 

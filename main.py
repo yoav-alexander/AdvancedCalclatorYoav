@@ -1,6 +1,7 @@
 from Analyzer import analyze_expression, is_valid_expression
 from Operations_calculator import calculate_from_prefix
 from Parser import convert_to_postfix
+from config import ExpressionSyntaxError
 
 
 def calculate_expression(expression: str) -> float:
@@ -8,7 +9,7 @@ def calculate_expression(expression: str) -> float:
     receives and expression and returns its result
     :param str expression: an expression to be evaluated
     :return float : returns the solution to the given expression
-    :raise ValueError: if the given expression is invalid
+    :raise ExpressionSyntaxError: if the given expression is invalid
     """
     is_valid_expression(expression)
     expression = "".join(expression.split())
@@ -30,7 +31,7 @@ def main():
 
     try:
         result = calculate_expression(expression)
-    except ValueError as e:
+    except ExpressionSyntaxError as e:
         print(e)
         return
 
