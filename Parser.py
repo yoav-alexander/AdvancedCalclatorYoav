@@ -1,13 +1,11 @@
 from typing import List
-from Operators import OPERATORS
-from config import ExpressionSyntaxError
+from config import ExpressionSyntaxError, OPERATORS, NON_COLLECTING_OPERATORS
 
 """
 this module receives a list of tokens that are part of an expression,
 converts it to a postfix expression and runs checks that the
 expression is valid
 """
-NON_COLLECTING_OPERATORS = "#$@&!^"  # a list of operators which do their operation before updating the number sign
 
 
 def convert_to_postfix(token_list: List[int | str]) -> List[int | str]:

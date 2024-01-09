@@ -1,6 +1,5 @@
 from typing import List
-from Operators import OPERATORS
-from config import ExpressionSyntaxError
+from config import ExpressionSyntaxError, OPERATORS
 
 """
 this module receives a postfix expression of operations and

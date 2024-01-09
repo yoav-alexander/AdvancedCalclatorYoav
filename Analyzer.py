@@ -1,6 +1,5 @@
 from typing import List
-from Operators import OPERATORS, IMPLIED_OPERATORS
-from config import ExpressionSyntaxError
+from config import ExpressionSyntaxError, OPERATORS, IMPLIED_OPERATORS
 
 """
 this module receives an expression and splits it into
@@ -18,7 +17,7 @@ VALID_BEFORE = ")" + ''.join([op for op in OPERATORS if not OPERATORS[op].input_
 VALID_AFTER = "(" + ''.join([op for op in OPERATORS if not OPERATORS[op].input_before])
 
 
-def analyze_expression(expression: str) -> List[float | str]:  # TODO add checks for 1+()+3
+def analyze_expression(expression: str) -> List[float | str]:
     """
     receives a string expression and converts it into a list basic tokens
     :param str expression: string expression
@@ -106,15 +105,6 @@ def valid_symbol(token: str | float, accepted_values: list[str] | str) -> bool:
     :return bool: returns if the given token is valid given the accepted_values given
     """
     return isinstance(token, str) and token not in accepted_values
-
-# def strip_minus(num_str: str) -> List[str | float]:
-#     """
-#     strips redundant '-' from the given str and splits to list
-#     :param str num_str: a string to strip
-#     :return List[str]: returns a list of a number and a minus sign if needed
-#     """
-#     num = num_str.strip("-")
-#     return [num] if num_str.count('-') % 2 == 0 else ['s', num]
 
 
 def is_valid_expression(expression: str) -> None:
