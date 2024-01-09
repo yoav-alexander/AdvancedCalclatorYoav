@@ -7,7 +7,7 @@ this module receives a list of tokens that are part of an expression,
 converts it to a postfix expression and runs checks that the
 expression is valid
 """
-NON_COLLECTING_OPERATORS = "!^"  # a list of operators which do their operation before updating the number sign
+NON_COLLECTING_OPERATORS = "#$@&!^"  # a list of operators which do their operation before updating the number sign
 
 
 def convert_to_postfix(token_list: List[int | str]) -> List[int | str]:
@@ -38,7 +38,7 @@ def convert_to_postfix(token_list: List[int | str]) -> List[int | str]:
     if "(" in stack or ")" in stack:
         raise ExpressionSyntaxError("invalid parenthesis order ")
 
-    print(stack)
+    print("\tstack: ", stack)
     postfix.extend(reversed(stack))
     return postfix
 
@@ -50,7 +50,8 @@ def has_priority(operator1: str, operator2: str) -> bool:
     :param str operator2:  the second operator to check
     :return bool: returns if operator1 has_priority over operator2
     """
-    print("operators", operator1, operator2)
     if operator1 == "S" and operator2 in NON_COLLECTING_OPERATORS:
+        return False
+    if operator1 == operator2 and not OPERATORS[operator1].input_before and OPERATORS[operator1].inputs == 1:
         return False
     return OPERATORS[operator1].priority >= OPERATORS[operator2].priority

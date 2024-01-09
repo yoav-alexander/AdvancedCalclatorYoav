@@ -73,7 +73,7 @@ def is_valid_order(token_list: List[float | str]) -> None:
     """
     checks if the operators placements are possible in the given operation
     :param  List[Union[float, str]] token_list: a list of token that form an expression
-    :raise value error: if the operator placement is impossible
+    :raise ExpressionSyntaxError: if the operator placement is impossible
     """
 
     for index, token in enumerate(token_list):
