@@ -2,17 +2,6 @@ from Operations import divide, power, digit_sum, factorial
 from Operators import Operator, Implied_operators, is_sign_minus
 
 
-class ExpressionSyntaxError(Exception):
-    """Exception raised for any error in expression syntax
-
-        Attributes:
-            message -- explanation of the error
-        """
-    def __init__(self, message):
-        self.message = message
-        super().__init__(self.message)
-
-
 OPERATORS = {
     '+': Operator(1, 2, lambda num1, num2: num1 + num2),
     '-': Operator(1, 2, lambda num1, num2: num1 - num2),
@@ -30,11 +19,6 @@ OPERATORS = {
 }
 
 IMPLIED_OPERATORS = {
-    'S': Implied_operators(10, 1, lambda num1: -num1, is_sign_minus, input_before=False)
+    'S': Implied_operators(10, 2.5, 1, lambda num1: -num1, is_sign_minus, input_before=False)
 }
 OPERATORS.update(IMPLIED_OPERATORS)
-
-NON_COLLECTING_OPERATORS = "#$@&!^"  # a list of operators which do their operation before updating the number sign
-
-
-

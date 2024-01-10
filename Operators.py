@@ -46,14 +46,16 @@ class Implied_operators(Operator):
 
     Attributes:
         priority: float
+        init_pos_priority: float - priority when at the start of new part of expression
         inputs: int
         function: Callable[..., float]
         input_before: bool = True
         input_after: bool = True
     """
 
-    def __init__(self, priority: float, inputs: int, function: Callable[..., float],
+    def __init__(self, priority: float, init_pos_priority: float,  inputs: int, function: Callable[..., float],
                  check_func: Callable[[str, int], bool], input_before: bool = True, input_after: bool = True):
         super().__init__(priority, inputs, function, input_before, input_after)
         self.check_func = check_func
+        self.init_pos_priority = init_pos_priority
 
