@@ -1,5 +1,5 @@
 from typing import List
-from config import OPERATORS
+from Operators import OPERATORS
 
 """
 this module receives a list of tokens that are part of an expression,
@@ -13,7 +13,7 @@ def convert_to_postfix(token_list: List[int | str]) -> List[int | str]:
     converts a list of tokens to the corresponding prefix expression
     :param List[Union[int, str]] token_list: a list of numbers, operands and parenthesis that form an expression
     :return List[Union[int, str]]: returns the resulting postfix expression
-    :raise SyntaxError: if given expression is with invalid 2
+    :raise SyntaxError: if given expression is with invalid
     :algorithm : this function uses an implementation of the "Shunting yard algorithm"
     """
     stack = []
@@ -50,8 +50,5 @@ def has_priority(operator1: str, operator2: str, stack: list) -> bool:
     :return bool: returns if operator1 has_priority over operator2
     """
     if operator1 == "S" and (len(stack) == 1 or stack[-2] == "("):  # Search for "- X op" or "(- X op" syntax
-        return OPERATORS["S"].init_pos_priority >= OPERATORS[operator2].priority
-    # TODO: special case for ----3 can probably remove
-    # if operator1 == operator2 and not OPERATORS[operator1].input_before and OPERATORS[operator1].inputs == 1:
-    #     return False
+        return OPERATORS[operator2].priority < 2.5
     return OPERATORS[operator1].priority >= OPERATORS[operator2].priority

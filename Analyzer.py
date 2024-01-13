@@ -1,12 +1,11 @@
-from typing import List
-from config import OPERATORS, IMPLIED_OPERATORS
+from Operators import OPERATORS
 
 """
 this module receives an expression and splits it into
 a list of tokens
 """
 
-VALID_SYMBOLS = ''.join(filter(lambda op: op not in IMPLIED_OPERATORS, OPERATORS)) + "()"
+VALID_SYMBOLS = ''.join(OPERATORS.keys() - set("S")) + "()"
 # all valid input symbols for the program
 NUMERICS = ".0123456789"
 VALID_INPUTS = VALID_SYMBOLS + NUMERICS
@@ -17,7 +16,7 @@ VALID_BEFORE = ")" + ''.join([op for op in OPERATORS if not OPERATORS[op].input_
 VALID_AFTER = "(" + ''.join([op for op in OPERATORS if not OPERATORS[op].input_before])
 
 
-def analyze_expression(expression: str) -> List[float | str]:
+def analyze_expression(expression: str) -> list:
     """
     receives a string expression and converts it into a list basic tokens
     :param str expression: string expression
@@ -36,30 +35,40 @@ def analyze_expression(expression: str) -> List[float | str]:
             token_list.append(float(num))  # it's ok to cast because "check_valid_number"
             num = ""
 
-        # checks for special operators
-        for symbol, attributes in IMPLIED_OPERATORS.items():
-            if attributes.check_func(expression, index):
-                token_list.append(symbol)
-                break
-        else:
-            token_list.append(char)
+        token_list.append(char)
 
     if num != "":
         check_valid_number(num)  # checks if the number is in the correct syntax
         token_list.append(float(num))  # it's ok to cast because "check_valid_number"
 
+    token_list = convert_sign_minus(token_list)
     token_list = remove_dup_sign_minus(token_list)
+
     # checks if operators placements are possible
     is_valid_order(token_list)
 
     return token_list
 
 
-def remove_dup_sign_minus(token_list: List[float | str]) -> List[float | str]:
+def convert_sign_minus(token_list: list) -> list:
+    """
+    returns the given token list but with all the sign minus replaced with their corresponding symbol
+    :param List[float | str] token_list: a list basic tokens repressing an expression
+    :return  List[float | str]: returns the given token list but with all the sign minus
+    replaced with their corresponding symbol
+    """
+    valid_previse_symbols = [op for op in OPERATORS if OPERATORS[op].input_after] + ["("]
+    for index, token in enumerate(token_list):
+        if token == "-" and (index == 0 or token_list[index - 1] in valid_previse_symbols):
+            token_list[index] = "S"
+    return token_list
+
+
+def remove_dup_sign_minus(token_list: list) -> list:
     """
     return the original token list but with all the redundant sign minus
-    :param List[Union[float, str]] token_list: a list basic tokens
-    :return  List[Union[float, str]]: a list basic tokens without redundant sign minus
+    :param List[float | str] token_list: a list basic tokens
+    :return  List[float | str]: a list basic tokens without redundant sign minus
     """
     for i in range(len(token_list)-2, -1, -1):
         if token_list[i] == token_list[i + 1] == "S":
@@ -70,7 +79,7 @@ def remove_dup_sign_minus(token_list: List[float | str]) -> List[float | str]:
 def check_valid_number(num: str) -> None:
     """
     check if the given number has valid syntax
-    :param num: a string representing a number
+    :param str num: a string representing a number
     :raise SyntaxError: if the given number syntax is invalid
     """
     if num[0] == "." or num[-1] == ".":
@@ -81,10 +90,10 @@ def check_valid_number(num: str) -> None:
         raise SyntaxError(f"invalid number syntax: {num}")
 
 
-def is_valid_order(token_list: List[float | str]) -> None:
+def is_valid_order(token_list: list) -> None:
     """
     checks if the operators placements are possible in the given operation
-    :param  List[Union[float, str]] token_list: a list of token that form an expression
+    :param  List[float | str] token_list: a list of token that form an expression
     :raise SyntaxError: if the operator placement is impossible
     """
 

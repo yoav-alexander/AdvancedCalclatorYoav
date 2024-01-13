@@ -1,5 +1,5 @@
 from typing import List
-from config import OPERATORS
+from Operators import OPERATORS
 
 """
 this module receives a postfix expression of operations and

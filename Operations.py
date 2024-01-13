@@ -24,12 +24,14 @@ def factorial(num1: int) -> float:
     :return int: returns the factorial of the given number
     :raise ArithmeticError: num1 < 0 or not whole
     """
+    # check if whole number and positive
     if num1 < 0 or num1 % 1 != 0:
         raise ArithmeticError(f"invalid input for factorial operation: {num1}! ")
-    # check if whole number and positive
-    if num1 in [0, 1]:
-        return 1.0
-    return num1 * factorial(num1 - 1)
+
+    result = 1.0
+    for i in range(1, int(num1)+1):
+        result *= i
+    return result
 
 
 def power(base: float, exponent: float) -> float:
