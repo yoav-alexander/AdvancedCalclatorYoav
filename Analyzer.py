@@ -5,15 +5,15 @@ this module receives an expression and splits it into
 a list of tokens
 """
 
-VALID_SYMBOLS = ''.join(OPERATORS.keys() - set("S")) + "()"
+VALID_SYMBOLS = ''.join(filter(lambda op: op[0] != '<' and op[-1] != '>', OPERATORS)) + "()"
 # all valid input symbols for the program
 NUMERICS = ".0123456789"
 VALID_INPUTS = VALID_SYMBOLS + NUMERICS
 
 # values apart from numbers that can be before an operator
-VALID_BEFORE = ")" + ''.join([op for op in OPERATORS if not OPERATORS[op].input_after])
+VALID_BEFORE = ")" + ''.join(op for op in OPERATORS if not OPERATORS[op].input_after)
 # values apart from numbers that can be after an operator
-VALID_AFTER = "(" + ''.join([op for op in OPERATORS if not OPERATORS[op].input_before])
+VALID_AFTER = "(" + ''.join(op for op in OPERATORS if not OPERATORS[op].input_before)
 
 
 def analyze_expression(expression: str) -> list:
@@ -42,7 +42,6 @@ def analyze_expression(expression: str) -> list:
         token_list.append(float(num))  # it's ok to cast because "check_valid_number"
 
     token_list = convert_sign_minus(token_list)
-    token_list = remove_dup_sign_minus(token_list)
 
     # checks if operators placements are possible
     is_valid_order(token_list)
@@ -52,28 +51,34 @@ def analyze_expression(expression: str) -> list:
 
 def convert_sign_minus(token_list: list) -> list:
     """
-    returns the given token list but with all the sign minus replaced with their corresponding symbol
+    returns the given token list but with all the sign minus replaced with their corresponding symbols
     :param List[float | str] token_list: a list basic tokens repressing an expression
     :return  List[float | str]: returns the given token list but with all the sign minus
-    replaced with their corresponding symbol
+    replaced with their corresponding symbols
+    """
+    for index, token in enumerate(token_list):  # 5! -- 3
+        if is_sign_minus(token_list, index):
+            if index == 0 or token_list[index-1] in ["(", "<;->"]:
+                token_list[index] = "<;->"  # low priority sign minus
+            elif token_list[index - 1] in OPERATORS:  # OPERATORS includes <!-> ( <;-> caught earlier)
+                token_list[index] = "<!->"  # high priority sign minus
+    return token_list
+
+
+def is_sign_minus(token_list: list, index: int) -> bool:
+    """
+    returns if the given expression is a sign minus
+    :param List[float | str] token_list: a list basic tokens repressing an expression
+    :param int index: the index of the suspected sign minus
+    :return bool: returns if the given expression is a sign minus
     """
     valid_previse_symbols = [op for op in OPERATORS if OPERATORS[op].input_after] + ["("]
-    for index, token in enumerate(token_list):
-        if token == "-" and (index == 0 or token_list[index - 1] in valid_previse_symbols):
-            token_list[index] = "S"
-    return token_list
 
-
-def remove_dup_sign_minus(token_list: list) -> list:
-    """
-    return the original token list but with all the redundant sign minus
-    :param List[float | str] token_list: a list basic tokens
-    :return  List[float | str]: a list basic tokens without redundant sign minus
-    """
-    for i in range(len(token_list)-2, -1, -1):
-        if token_list[i] == token_list[i + 1] == "S":
-            del token_list[i: i+2]
-    return token_list
+    valid_before = index == 0 or token_list[index - 1] in valid_previse_symbols
+    valid_after = (index == len(token_list) - 1
+                   or isinstance(token_list[index + 1], float)
+                   or token_list[index + 1] in [")", "-"])
+    return token_list[index] == "-" and valid_before and valid_after
 
 
 def check_valid_number(num: str) -> None:
@@ -101,7 +106,8 @@ def is_valid_order(token_list: list) -> None:
 
         if token == "(" and index < len(token_list) - 1 and token_list[index + 1] == ")":
             raise SyntaxError("invalid parenthesis syntax '()' ")
-        elif token not in OPERATORS:
+
+        if token not in OPERATORS:
             continue
 
         if OPERATORS[token].input_before:
@@ -117,6 +123,9 @@ def is_valid_order(token_list: list) -> None:
             if valid_symbol(token_list[index+1], VALID_AFTER):
                 error_message = f"{'X' if OPERATORS[token].input_before else ''} {token} {token_list[index + 1]}"
                 raise SyntaxError(f"invalid syntax for operation: {error_message}")
+
+        if token == "~" and token_list[index+1] == "~":
+            raise SyntaxError(f"invalid syntax for operation: ~~ ")
 
 
 def valid_symbol(token: str | float, accepted_values: list[str] | str) -> bool:

@@ -1,4 +1,3 @@
-from typing import List
 from Operators import OPERATORS
 
 """
@@ -7,7 +6,7 @@ calculates the final result
 """
 
 
-def calculate_from_prefix(postfix_list: List[int | str]) -> float:
+def calculate_from_prefix(postfix_list: list) -> float:
     """
     return the solution to an expression in prefix notation
     :param List[Union[int, str]] postfix_list: a list of the expression in prefix notation

@@ -41,5 +41,7 @@ OPERATORS = {
     '#': Operator(6, 1, digit_sum, input_after=False),
     '!': Operator(6, 1, factorial, input_after=False),
 
-    'S': Operator(10, 1, lambda num1: -num1, input_before=False)
+    # special implied operators. syntax: "< X >"
+    '<!->': Operator(10, 1, lambda num1: -num1, input_before=False),  # high priority sign minus
+    '<;->': Operator(2.5, 1, lambda num1: -num1, input_before=False)  # low priority sign minus
 }
