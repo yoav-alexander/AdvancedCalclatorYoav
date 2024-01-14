@@ -50,22 +50,6 @@ def analyze_expression(expression: str) -> list:
     return token_list
 
 
-def convert_sign_minus(token_list: list) -> list:
-    """
-    returns the given token list but with all the sign minus replaced with their corresponding symbols
-    :param List[float | str] token_list: a list basic tokens repressing an expression
-    :return  List[float | str]: returns the given token list but with all the sign minus
-    replaced with their corresponding symbols
-    """
-    for index, token in enumerate(token_list):  # 5! -- 3
-        if is_sign_minus(token_list, index):
-            if index == 0 or token_list[index-1] in ["(", "<;->"]:
-                token_list[index] = "<;->"  # low priority sign minus
-            elif token_list[index - 1] in OPERATORS:  # OPERATORS includes <!-> ( <;-> caught earlier)
-                token_list[index] = "<!->"  # high priority sign minus
-    return token_list
-
-
 def is_sign_minus(token_list: list, index: int) -> bool:
     """
     returns if the given expression is a sign minus
@@ -80,6 +64,22 @@ def is_sign_minus(token_list: list, index: int) -> bool:
                    or isinstance(token_list[index + 1], float)
                    or token_list[index + 1] in ["(", "-"])
     return token_list[index] == "-" and valid_before and valid_after
+
+
+def convert_sign_minus(token_list: list) -> list:
+    """
+    returns the given token list but with all the sign minus replaced with their corresponding symbols
+    :param List[float | str] token_list: a list basic tokens repressing an expression
+    :return  List[float | str]: returns the given token list but with all the sign minus
+    replaced with their corresponding symbols
+    """
+    for index, token in enumerate(token_list):
+        if is_sign_minus(token_list, index):
+            if index == 0 or token_list[index-1] in ["(", "<;->"]:
+                token_list[index] = "<;->"  # low priority sign minus
+            elif token_list[index - 1] in OPERATORS:  # OPERATORS includes <!-> ( <;-> caught earlier)
+                token_list[index] = "<!->"  # high priority sign minus
+    return token_list
 
 
 def check_valid_number(num: str) -> None:
@@ -114,24 +114,26 @@ def is_valid_order(token_list: list) -> None:
         if OPERATORS[token].input_before:
             if index == 0:
                 raise SyntaxError(f" '{token}' operator can't be the at the start of an expression")
-            if valid_symbol(token_list[index-1], VALID_BEFORE):
-                error_message = f"{token_list[index - 1]} {token} {'X' if OPERATORS[token].input_after else ''}"
+            if invalid_symbol(token_list[index-1], VALID_BEFORE):
+                invalid_operand = OPERATORS[token_list[index - 1]].symbol
+                error_message = f"{invalid_operand} {token} {'X' if OPERATORS[token].input_after else ''}"
                 raise SyntaxError(f"invalid syntax for operation: {error_message}")
 
         if OPERATORS[token].input_after:
             if index == len(token_list) - 1:
                 raise SyntaxError(f" '{token}' operator can't be the at the end of an expression")
-            if valid_symbol(token_list[index+1], VALID_AFTER):
-                error_message = f"{'X' if OPERATORS[token].input_before else ''} {token} {token_list[index + 1]}"
+            if invalid_symbol(token_list[index+1], VALID_AFTER):
+                invalid_operand = OPERATORS[token_list[index + 1]].symbol
+                error_message = f"{'X' if OPERATORS[token].input_before else ''} {token} {invalid_operand}"
                 raise SyntaxError(f"invalid syntax for operation: {error_message}")
 
         if token == "~" and token_list[index+1] == "~":
             raise SyntaxError(f"invalid syntax for operation: ~~ ")
 
 
-def valid_symbol(token: str | float, accepted_values: list[str] | str) -> bool:
+def invalid_symbol(token: str | float, accepted_values: list[str] | str) -> bool:
     """
-    returns if the given token is valid given the accepted_values given
+    returns if the given token is invalid given the accepted_values given
     :param str | float token: a number or operator in the expression
     :param list[str] | str accepted_values: a list of accepted_values for the token
     :return bool: returns if the given token is valid given the accepted_values given
