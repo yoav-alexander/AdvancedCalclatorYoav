@@ -43,6 +43,7 @@ def analyze_expression(expression: str) -> list:
 
     token_list = convert_sign_minus(token_list)
 
+    print(token_list)
     # checks if operators placements are possible
     is_valid_order(token_list)
 
@@ -77,7 +78,7 @@ def is_sign_minus(token_list: list, index: int) -> bool:
     valid_before = index == 0 or token_list[index - 1] in valid_previse_symbols
     valid_after = (index == len(token_list) - 1
                    or isinstance(token_list[index + 1], float)
-                   or token_list[index + 1] in [")", "-"])
+                   or token_list[index + 1] in ["(", "-"])
     return token_list[index] == "-" and valid_before and valid_after
 
 
