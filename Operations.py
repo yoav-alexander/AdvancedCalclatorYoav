@@ -1,3 +1,5 @@
+import math
+
 """
 this module includes all the necessary
 function to run operations for the calculator
@@ -13,7 +15,7 @@ def divide(num1: float, num2: float) -> float:
     :raise ArithmeticError: if divides by 0
     """
     if num2 == 0:
-        raise ArithmeticError("division by 0 ")
+        raise ArithmeticError(f"division by 0: {num1:g}/{num2:g}")
     return num1 / num2
 
 
@@ -29,8 +31,11 @@ def factorial(num1: int) -> float:
         raise ArithmeticError(f"invalid input for factorial operation: {num1}! ")
 
     result = 1.0
-    for i in range(1, int(num1)+1):
+    for i in range(1, int(num1) + 1):
         result *= i
+
+    if result == float("inf"):
+        raise OverflowError("result too large")
     return result
 
 
@@ -42,9 +47,12 @@ def power(base: float, exponent: float) -> float:
     :return float: returns base to the power of exponent
     :raise ArithmeticError: if invalid
     """
-    if base == exponent == 0 or -1 < exponent < 1 and base < 0:
-        raise ArithmeticError(f"invalid input for power operation: {base}^{exponent} ")
-    return base ** exponent
+    if base == exponent == 0:
+        raise ArithmeticError(f"invalid input for power operation: {base:g}^{exponent:g}")
+    try:
+        return math.pow(base, exponent)
+    except (ValueError, OverflowError):
+        raise ArithmeticError(f"invalid input for power operation: {base:g}^{exponent:g}")
 
 
 def digit_sum(num1: float) -> float:
@@ -56,5 +64,4 @@ def digit_sum(num1: float) -> float:
     """
     if num1 < 0:
         raise ArithmeticError(f"invalid input for digit sum operation: {num1}")
-    return sum(float(digit) for digit in str(num1) if digit.isnumeric())
-
+    return sum(float(digit) for digit in str(f"{num1:f}") if digit.isdigit())

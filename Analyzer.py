@@ -2,10 +2,11 @@ from Operators import OPERATORS
 
 """
 this module receives an expression and splits it into
-a list of tokens
+a list of tokens and runs checks that the
+expression is valid
 """
 
-VALID_SYMBOLS = ''.join(filter(lambda op: op[0] != '<' and op[-1] != '>', OPERATORS)) + "()"
+VALID_SYMBOLS = ''.join(op for op in OPERATORS if not OPERATORS[op].inferred) + "()"
 # all valid input symbols for the program
 NUMERICS = ".0123456789"
 VALID_INPUTS = VALID_SYMBOLS + NUMERICS
@@ -28,14 +29,12 @@ def analyze_expression(expression: str) -> list:
     for index, char in enumerate(expression):
         if char in NUMERICS:
             num += char
-            continue
-
-        if num != "":
-            check_valid_number(num)  # checks if the number is in the correct syntax
-            token_list.append(float(num))  # it's ok to cast because "check_valid_number"
-            num = ""
-
-        token_list.append(char)
+        else:
+            if num != "":
+                check_valid_number(num)  # checks if the number is in the correct syntax
+                token_list.append(float(num))  # it's ok to cast because "check_valid_number"
+                num = ""
+            token_list.append(char)
 
     if num != "":
         check_valid_number(num)  # checks if the number is in the correct syntax
@@ -43,7 +42,7 @@ def analyze_expression(expression: str) -> list:
 
     token_list = convert_sign_minus(token_list)
 
-    print(token_list)
+    # print(token_list)
     # checks if operators placements are possible
     is_valid_order(token_list)
 
@@ -77,7 +76,7 @@ def convert_sign_minus(token_list: list) -> list:
         if is_sign_minus(token_list, index):
             if index == 0 or token_list[index-1] in ["(", "<;->"]:
                 token_list[index] = "<;->"  # low priority sign minus
-            elif token_list[index - 1] in OPERATORS:  # OPERATORS includes <!-> ( <;-> caught earlier)
+            elif token_list[index - 1] in OPERATORS:
                 token_list[index] = "<!->"  # high priority sign minus
     return token_list
 
@@ -89,7 +88,7 @@ def check_valid_number(num: str) -> None:
     :raise SyntaxError: if the given number syntax is invalid
     """
     if num[0] == "." or num[-1] == ".":
-        raise SyntaxError(f"invalid number syntax! '.' in invalid place: {num} ")
+        raise SyntaxError(f"invalid number syntax! '.' in invalid place: '{num}' ")
     try:
         float(num)
     except ValueError:
@@ -108,24 +107,22 @@ def is_valid_order(token_list: list) -> None:
         if token == "(" and index < len(token_list) - 1 and token_list[index + 1] == ")":
             raise SyntaxError("invalid parenthesis syntax '()' ")
 
-        if token not in OPERATORS:
-            continue
+        if token in OPERATORS:
+            if OPERATORS[token].input_before:
+                if index == 0:
+                    raise SyntaxError(f" '{token}' operator can't be the at the start of an expression")
+                if invalid_symbol(token_list[index-1], VALID_BEFORE):
+                    invalid_operand = OPERATORS[token_list[index - 1]].symbol
+                    error_message = f"{invalid_operand} {token} {'X' if OPERATORS[token].input_after else ''}"
+                    raise SyntaxError(f"invalid syntax for operation: {error_message}")
 
-        if OPERATORS[token].input_before:
-            if index == 0:
-                raise SyntaxError(f" '{token}' operator can't be the at the start of an expression")
-            if invalid_symbol(token_list[index-1], VALID_BEFORE):
-                invalid_operand = OPERATORS[token_list[index - 1]].symbol
-                error_message = f"{invalid_operand} {token} {'X' if OPERATORS[token].input_after else ''}"
-                raise SyntaxError(f"invalid syntax for operation: {error_message}")
-
-        if OPERATORS[token].input_after:
-            if index == len(token_list) - 1:
-                raise SyntaxError(f" '{token}' operator can't be the at the end of an expression")
-            if invalid_symbol(token_list[index+1], VALID_AFTER):
-                invalid_operand = OPERATORS[token_list[index + 1]].symbol
-                error_message = f"{'X' if OPERATORS[token].input_before else ''} {token} {invalid_operand}"
-                raise SyntaxError(f"invalid syntax for operation: {error_message}")
+            if OPERATORS[token].input_after:
+                if index == len(token_list) - 1:
+                    raise SyntaxError(f" '{token}' operator can't be the at the end of an expression")
+                if invalid_symbol(token_list[index+1], VALID_AFTER):
+                    invalid_operand = OPERATORS[token_list[index + 1]].symbol
+                    error_message = f"{'X' if OPERATORS[token].input_before else ''} {token} {invalid_operand}"
+                    raise SyntaxError(f"invalid syntax for operation: {error_message}")
 
         if token == "~" and token_list[index+1] == "~":
             raise SyntaxError(f"invalid syntax for operation: ~~ ")
@@ -147,11 +144,10 @@ def is_valid_expression(expression: str) -> None:
     :param string expression: an expression to check
     :raise SyntaxError: if the expression contains invalid symbols
     """
-
-    # for index, symbol in enumerate(expression.split(" ")[:-1]):
-    #     print(index, symbol)
-    #     if symbol in NUMERICS and expression[index+1] in NUMERICS:
-    #         raise SyntaxError(f"invalid spacing between number digits")
+    words_ls = [word for word in expression.split(" ") if word]
+    for i in range(len(words_ls)-1):
+        if words_ls[i][-1].isdigit() and words_ls[i+1][0].isdigit():
+            raise SyntaxError(f"invalid spacing between number digits")
 
     expression = "".join(expression.split())
     for char in expression:

@@ -35,7 +35,6 @@ def convert_to_postfix(token_list: list) -> list:
     if "(" in stack or ")" in stack:
         raise SyntaxError("invalid parenthesis order ")
 
-    # print("\t stack: ", stack)
     postfix.extend(reversed(stack))
     return postfix
 
