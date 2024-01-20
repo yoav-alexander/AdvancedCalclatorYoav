@@ -6,15 +6,16 @@ a list of tokens and runs checks that the
 expression is valid
 """
 
-VALID_SYMBOLS = ''.join(op for op in OPERATORS if not OPERATORS[op].inferred) + "()"
+BRACKETS = {"(": ")"}
+VALID_SYMBOLS = ''.join([op for op in OPERATORS if not OPERATORS[op].inferred] + list(*BRACKETS.items()))
 # all valid input symbols for the program
 NUMERICS = ".0123456789"
 VALID_INPUTS = VALID_SYMBOLS + NUMERICS
 
 # values apart from numbers that can be before an operator
-VALID_BEFORE = ")" + ''.join(op for op in OPERATORS if not OPERATORS[op].input_after)
+VALID_BEFORE = [op for op in OPERATORS if not OPERATORS[op].input_after] + list(BRACKETS.values())
 # values apart from numbers that can be after an operator
-VALID_AFTER = "(" + ''.join(op for op in OPERATORS if not OPERATORS[op].input_before)
+VALID_AFTER = [op for op in OPERATORS if not OPERATORS[op].input_before] + list(BRACKETS.keys())
 
 
 def analyze_expression(expression: str) -> list:
@@ -42,7 +43,6 @@ def analyze_expression(expression: str) -> list:
 
     token_list = convert_sign_minus(token_list)
 
-    # print(token_list)
     # checks if operators placements are possible
     is_valid_order(token_list)
 
@@ -56,12 +56,12 @@ def is_sign_minus(token_list: list, index: int) -> bool:
     :param int index: the index of the suspected sign minus
     :return bool: returns if the given expression is a sign minus
     """
-    valid_previse_symbols = [op for op in OPERATORS if OPERATORS[op].input_after] + ["("]
+    valid_previse_symbols = [op for op in OPERATORS if OPERATORS[op].input_after] + list(BRACKETS.keys())
 
     valid_before = index == 0 or token_list[index - 1] in valid_previse_symbols
     valid_after = (index == len(token_list) - 1
                    or isinstance(token_list[index + 1], float)
-                   or token_list[index + 1] in ["(", "-"])
+                   or token_list[index + 1] in (["-"] + list(BRACKETS.keys())))
     return token_list[index] == "-" and valid_before and valid_after
 
 
@@ -74,7 +74,7 @@ def convert_sign_minus(token_list: list) -> list:
     """
     for index, token in enumerate(token_list):
         if is_sign_minus(token_list, index):
-            if index == 0 or token_list[index-1] in ["(", "<;->"]:
+            if index == 0 or token_list[index-1] in (["<;->"] + list(BRACKETS.keys())):
                 token_list[index] = "<;->"  # low priority sign minus
             elif token_list[index - 1] in OPERATORS:
                 token_list[index] = "<!->"  # high priority sign minus
@@ -104,7 +104,7 @@ def is_valid_order(token_list: list) -> None:
 
     for index, token in enumerate(token_list):
 
-        if token == "(" and index < len(token_list) - 1 and token_list[index + 1] == ")":
+        if token in BRACKETS and index < len(token_list) - 1 and token_list[index + 1] == BRACKETS[token]:
             raise SyntaxError("invalid parenthesis syntax '()' ")
 
         if token in OPERATORS:
@@ -112,16 +112,22 @@ def is_valid_order(token_list: list) -> None:
                 if index == 0:
                     raise SyntaxError(f" '{token}' operator can't be the at the start of an expression")
                 if invalid_symbol(token_list[index-1], VALID_BEFORE):
-                    invalid_operand = OPERATORS[token_list[index - 1]].symbol
-                    error_message = f"{invalid_operand} {token} {'X' if OPERATORS[token].input_after else ''}"
+                    invalid_operand = token_list[index-1]
+                    if token_list[index - 1] in OPERATORS:
+                        invalid_operand = OPERATORS[token_list[index - 1]].symbol
+                    next_symbol = 'X' if OPERATORS[token].input_after else ''
+                    error_message = f"{invalid_operand} {OPERATORS[token].symbol} {next_symbol}"
                     raise SyntaxError(f"invalid syntax for operation: {error_message}")
 
             if OPERATORS[token].input_after:
                 if index == len(token_list) - 1:
                     raise SyntaxError(f" '{token}' operator can't be the at the end of an expression")
                 if invalid_symbol(token_list[index+1], VALID_AFTER):
-                    invalid_operand = OPERATORS[token_list[index + 1]].symbol
-                    error_message = f"{'X' if OPERATORS[token].input_before else ''} {token} {invalid_operand}"
+                    invalid_operand = token_list[index + 1]
+                    if token_list[index + 1] in OPERATORS:
+                        invalid_operand = OPERATORS[token_list[index + 1]].symbol
+                    before_symbol = 'X' if OPERATORS[token].input_before else ''
+                    error_message = f"{before_symbol} {OPERATORS[token].symbol} {invalid_operand}"
                     raise SyntaxError(f"invalid syntax for operation: {error_message}")
 
         if token == "~" and token_list[index+1] == "~":

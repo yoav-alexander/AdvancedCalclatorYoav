@@ -44,7 +44,7 @@ OPERATORS = {
     '#': Operator('#', 6, 1, digit_sum, input_after=False),
     '!': Operator('!', 6, 1, factorial, input_after=False),
 
-    # special implied operators.
+    # special inferrd operators.
     '<!->': Operator("-", 10, 1, lambda num1: -num1, input_before=False, inferred=True),
     '<;->': Operator("-", 3.5, 1, lambda num1: -num1, input_before=False, inferred=True)
 }

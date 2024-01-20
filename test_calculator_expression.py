@@ -18,6 +18,10 @@ from main import calculate_expression
     )
 )
 def test_calculate_expression_fail(expression: str):
+    """
+    tests simple expressions with syntax errors
+    :param str expression: an expression to test
+    """
     with pytest.raises(SyntaxError):
         calculate_expression(expression)
 
@@ -43,6 +47,11 @@ def test_calculate_expression_fail(expression: str):
     )
 )
 def test_calculate_expression(expression: str, expected_result: float):
+    """
+    tests simple valid expressions
+    :param str expression: an expression to test
+    :param float expected_result: the expected result of the expression
+    """
     assert calculate_expression(expression) == expected_result
 
 
@@ -72,5 +81,9 @@ def test_calculate_expression(expression: str, expected_result: float):
     )
 )
 def test_calculate_expression_complex(expression: str, expected_result: float):
+    """
+    tests complex valid expressions
+    :param str expression: an expression to test
+    :param float expected_result: the expected result of the expression
+    """
     assert calculate_expression(expression) == expected_result
-
