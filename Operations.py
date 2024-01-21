@@ -15,7 +15,7 @@ def divide(num1: float, num2: float) -> float:
     :raise ArithmeticError: if divides by 0
     """
     if num2 == 0:
-        raise ArithmeticError(f"division by 0: {num1:g}/{num2:g}")
+        raise ArithmeticError(f"invalid division by 0: {num1:g}/{num2:g}")
     return num1 / num2
 
 
@@ -26,9 +26,8 @@ def factorial(num1: int) -> float:
     :return int: returns the factorial of the given number
     :raise ArithmeticError: num1 < 0 or not whole
     """
-    # check if whole number and positive
-    if num1 < 0 or num1 % 1 != 0:
-        raise ArithmeticError(f"invalid input for factorial operation: {num1}! ")
+    if num1 % 1 != 0 or num1 < 0:
+        raise ArithmeticError(f"invalid input: factorial operation is only valid for positive integers: {num1:g}! ")
 
     result = 1.0
     for i in range(1, int(num1) + 1):
@@ -63,5 +62,5 @@ def digit_sum(num1: float) -> float:
     :raise ArithmeticError: if given negative number
     """
     if num1 < 0:
-        raise ArithmeticError(f"invalid input for digit sum operation: {num1}")
+        raise ArithmeticError(f"invalid input: digit sum operation is invalid for negative numbers: {num1}")
     return sum(float(digit) for digit in str(f"{num1:f}") if digit.isdigit())

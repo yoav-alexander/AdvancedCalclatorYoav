@@ -11,6 +11,7 @@ def calculate_from_prefix(postfix_list: list) -> float:
     return the solution to an expression in prefix notation
     :param List[Union[int, str]] postfix_list: a list of the expression in prefix notation
     :return float : returns the solution to the expression
+    :raise ArithmeticError: if attempted to do invalid operation
     :raise SyntaxError: if the expression is unsolvable or invalid
     """
     changed = False  # marks if the list was changed during the iteration
@@ -32,10 +33,7 @@ def calculate_from_prefix(postfix_list: list) -> float:
             args = postfix_list[index - OPERATORS[token].inputs: index]
             if is_valid_args(args) and len(args) == OPERATORS[token].inputs:
                 # print("\t", token, "args: ", args)
-                try:
-                    result = OPERATORS[token].function(*args)
-                except ArithmeticError as e:
-                    raise SyntaxError(e)
+                result = OPERATORS[token].function(*args)
                 del postfix_list[index - OPERATORS[token].inputs: index + 1]
                 postfix_list.insert(index - OPERATORS[token].inputs, result)
                 changed = True

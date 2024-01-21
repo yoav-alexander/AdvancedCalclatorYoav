@@ -110,7 +110,7 @@ def is_valid_order(token_list: list) -> None:
         if token in OPERATORS:
             if OPERATORS[token].input_before:
                 if index == 0:
-                    raise SyntaxError(f" '{token}' operator can't be the at the start of an expression")
+                    raise SyntaxError(f"'{token}' operator can't be the at the start of an expression")
                 if invalid_symbol(token_list[index-1], VALID_BEFORE):
                     invalid_operand = token_list[index-1]
                     if token_list[index - 1] in OPERATORS:
@@ -121,7 +121,7 @@ def is_valid_order(token_list: list) -> None:
 
             if OPERATORS[token].input_after:
                 if index == len(token_list) - 1:
-                    raise SyntaxError(f" '{token}' operator can't be the at the end of an expression")
+                    raise SyntaxError(f"'{token}' operator can't be the at the end of an expression")
                 if invalid_symbol(token_list[index+1], VALID_AFTER):
                     invalid_operand = token_list[index + 1]
                     if token_list[index + 1] in OPERATORS:
