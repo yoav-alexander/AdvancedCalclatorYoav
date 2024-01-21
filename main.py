@@ -9,6 +9,7 @@ def calculate_expression(expression: str) -> float:
     :param str expression: an expression to be evaluated
     :return float : returns the solution to the given expression
     :raise SyntaxError: if the given expression is invalid
+    :raise ArithmeticError: if attempted to do an invalid operation
     """
     is_valid_expression(expression)
     expression = "".join(expression.split())
@@ -31,7 +32,7 @@ def main():
 
     try:
         result = calculate_expression(expression)
-    except SyntaxError as e:
+    except (SyntaxError, ArithmeticError) as e:
         print(e)
         return
 
